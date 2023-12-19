@@ -32,6 +32,10 @@ class Tile
     @directions << 'D' if down && down.directions.include?('U')
   end
 
+  def shape_from_dirs
+    ALLOWED_DIRS.map {|k, v| [v.sort, k]}.to_h[directions.sort]
+  end
+
   def neighbours
     return @neighbours if @neighbours
     @neighbours = []
@@ -93,7 +97,6 @@ class Board
         if neigh.distance < 0 || neigh.distance > (visiting.distance + 1)
           neigh.distance = visiting.distance + 1
           to_visit << neigh
-          puts to_visit.inspect
         end
       end
     end
@@ -108,84 +111,82 @@ class Board
     return nil if x < 0 || y < 0 || x >= $width || y >= $height
     @board[x][y]
   end
+
+  def tiles_inside
+    inside = []
+    (0...$width).each do |x|
+      (0...$height).each do |y|
+        tile = self[x,y]
+        next if graph.include?(tile)
+        inside << tile if is_inside?(tile)
+      end
+    end
+    inside
+  end
+
+  def is_inside?(tile)
+    in_ray = graph.select { |gtile| gtile.x == tile.x && gtile.y > tile.y }.sort_by(&:y)
+    return false if in_ray.empty?
+    crossings = 0
+    turn_seen = nil
+    in_ray.each do |tile|
+      pipe = tile.shape
+      pipe = tile.shape_from_dirs if tile.shape == 'S'
+      if pipe == '-'
+        crossings += 1
+        next
+      end
+
+      if pipe == 'J'
+        if turn_seen == 'F'
+          crossings += 1
+          turn_seen = nil
+        else
+          turn_seen = pipe
+        end
+        next
+      end
+
+      if pipe == 'F'
+        if turn_seen == 'J'
+          crossings += 1
+          turn_seen = nil
+        elsif turn_seen == 'L'
+          turn_seen = nil
+        else
+          turn_seen = pipe
+        end
+        next
+      end
+
+      if pipe == '7'
+        if turn_seen == 'L'
+          crossings += 1
+          turn_seen = nil
+        elsif turn_seen == 'J'
+          turn_seen = nil
+        else
+          turn_seen = pipe
+        end
+        next
+      end
+
+      if pipe == 'L'
+        if turn_seen == '7'
+          crossings += 1
+          turn_seen = nil
+        else
+          turn_seen = pipe
+        end
+        next
+      end
+    end
+    crossings.odd?
+  end
 end
 
 $board = Board.new
 
 puts $board.max_distance
-
-def is_inside?(point, graph)
-  in_ray = graph.keys.select { |gx, gy| point[1] == gy && gx > point[0] }.sort_by { |x, _| x }.map { |x, y| $matrix[y][x] }
-  return false if in_ray.empty?
-  crossings = 0
-  turn_seen = nil
-  in_ray.each do |pipe|
-    next if pipe == '-'
-    if pipe == '|'
-      crossings += 1
-      next
-    end
-    if turn_seen.nil?
-      turn_seen = pipe
-      next
-    end
-
-    if pipe == 'J'
-      if turn_seen == 'F'
-        crossings += 1
-        turn_seen = nil
-      elsif turn_seen == 'L'
-        turn_seen = nil
-      else
-        turn_seen = pipe
-      end
-    end
-
-    if pipe == '7'
-      if turn_seen == 'L'
-        crossings += 1
-        turn_seen = nil
-      elsif turn_seen == 'F'
-        turn_seen = nil
-      else
-        turn_seen = pipe
-      end
-    end
-
-    if pipe == 'L'
-      if turn_seen == '7'
-        crossings += 1
-        turn_seen = nil
-      elsif turn_seen == 'J'
-        turn_seen = nil
-      end
-    end
-
-    if pipe == 'F'
-      if turn_seen == 'J'
-        crossings += 1
-        turn_seen = nil
-      elsif turn_seen == '7'
-        turn_seen = nil
-      end
-    end
-  end
-  crossings.odd?
-end
-
-# graph = build_graph
-#
-# counter = 0
-# points = 0
-# all = 0
-# (0...$matrix.length).each do |y|
-#   (0...$matrix[0].length).each do |x|
-#     all += 1
-#     next if graph.has_key?([x, y])
-#     points += 1
-#     counter += 1 if is_inside?([x, y], graph)
-#   end
-# end
-# puts all
-# puts counter
-# puts points
+puts $board.graph.length
+puts $board.tiles_inside.count
