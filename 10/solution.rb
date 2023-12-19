@@ -1,6 +1,6 @@
-$neighbours = (-1..1).to_a.product((-1..1).to_a) - [[0, 0]]
+$neighbours = [[-1, 0], [1,0], [0, -1], [0, 1]]
 
-$allowed_cords = {
+$allowed_dirs = {
   '|' => [[0, 1], [0, -1]],
   '-' => [[1, 0], [-1, 0]],
   'L' => [[0, -1], [1, 0]],
@@ -17,8 +17,8 @@ start_x = $matrix[start_y].find_index('S')
 def can_connect?(point, pipecoords)
   return false unless pipecoords[1] < $matrix.length && pipecoords[0] < $matrix[pipecoords[1]].length
   pipe = $matrix[pipecoords[1]][pipecoords[0]]
-  return false unless $allowed_cords.has_key?(pipe)
-  $allowed_cords[pipe].map { |x, y| [pipecoords[0] + x, pipecoords[1] + y] }.include?(point)
+  return false unless $allowed_dirs.has_key?(pipe)
+  $allowed_dirs[pipe].map { |x, y| [pipecoords[0] + x, pipecoords[1] + y] }.include?(point)
 end
 
 def accessible_neighbours(point)
