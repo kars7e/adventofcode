@@ -18,4 +18,3 @@ puts sequence.map { |step| hashfunc(step)}.sum
 
 
 
-  
