@@ -23,6 +23,7 @@ end
 def find_first_block(pattern, length)
   pattern.chars.each_cons(length).with_index do |block, index|
     return index if block.all? { |elem| elem == '#' || elem == '?' } && pattern[index+length] != '#'
+    return nil if block[0] == '#'
   end
   nil
 end
