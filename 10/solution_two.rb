@@ -14,7 +14,7 @@ class Tile
   }
 
   attr_reader :x, :y, :shape, :directions
-  attr_accessor :distance
+  attr_accessor :total_heat
 
   def initialize(x, y, shape)
     @x, @y = x, y
@@ -63,72 +63,10 @@ class Tile
     $board[@x, @y - 1]
   end
 
-  def to_s
-    "Tile(#{x}, #{y}, #{shape}, #{distance})"
-  end
-end
-
-class Board
-  attr_reader :start_tile
-  attr_reader :board
-
-  def initialize
-    @board = []
-    $matrix.reverse.each_with_index do |row, y|
-      row.each_with_index do |tile, x|
-        @board[x] ||= []
-        @board[x][y] = Tile.new(x, y, tile)
-        if tile == 'S'
-          @start_tile = @board[x][y]
-        end
-      end
-    end
-  end
-
-  def graph
-    return @graph if @graph
-    @graph = {}
-    start_tile.init_start
-    to_visit = [start_tile]
-    until to_visit.empty?
-      visiting = to_visit.shift
-      @graph[visiting] = true
-      visiting.neighbours
-              .select { |neigh| neigh.distance < 0 || neigh.distance > visiting.distance + 1 }
-              .each { |neigh| neigh.distance = visiting.distance + 1; to_visit << neigh }
-    end
-    @graph
-  end
-
-  def max_distance
-    graph.keys.max_by(&:distance).distance
-  end
-
-  def [](x, y)
-    return nil if x < 0 || y < 0 || x >= $width || y >= $height
-    @board[x][y]
-  end
-
-  def tiles_inside
-    inside = {}
-    outside = {}
-    (0...$width).each do |x|
-      (0...$height).reverse_each do |y|
-        tile = self[x, y]
-        next if graph.has_key?(tile)
-        if is_inside?(tile, inside, outside, graph)
-          inside[tile] = true
-        else
-          outside[tile] = true
-        end
-      end
-    end
-    inside.keys
-  end
-
-  def is_inside?(tile, inside, outside, graph)
+  def is_inside?(inside, outside, graph)
     crossings = 0
     turn_seen = nil
+    tile = self
     until tile.nil?
       return true if inside.has_key?(tile) && crossings == 0
       return false if outside.has_key?(tile) && crossings == 0
@@ -175,6 +113,71 @@ class Board
     end
     crossings.odd?
   end
+
+  def to_s
+    "Tile(#{x}, #{y}, #{shape}, #{distance})"
+  end
+end
+
+class Board
+  attr_reader :start_tile
+  attr_reader :board
+
+  def initialize
+    @board = []
+    $matrix.reverse.each_with_index do |row, y|
+      row.each_with_index do |tile, x|
+        @board[x] ||= []
+        @board[x][y] = Tile.new(x, y, tile)
+        if tile == 'S'
+          @start_tile = @board[x][y]
+        end
+      end
+    end
+  end
+
+  def graph
+    return @graph if @graph
+    @graph = {}
+    start_tile.init_start
+    to_visit = [start_tile]
+    until to_visit.empty?
+      visiting = to_visit.shift
+      @graph[visiting] = true
+      visiting.neighbours
+              .select { |neigh| neigh.total_heat < 0 || neigh.total_heat > visiting.total_heat + 1 }
+              .each { |neigh| neigh.distance = visiting.total_heat + 1; to_visit << neigh }
+    end
+    @graph
+  end
+
+  def max_distance
+    graph.keys.max_by(&:total_heat).total_heat
+  end
+
+  def [](x, y)
+    return nil if x < 0 || y < 0 || x >= $width || y >= $height
+    @board[x][y]
+  end
+
+  def tiles_inside
+    inside = {}
+    outside = {}
+    (0...$width).each do |x|
+      (0...$height).reverse_each do |y|
+        tile = self[x, y]
+        next if graph.has_key?(tile)
+        if tile.is_inside?(inside, outside, graph)
+          inside[tile] = true
+        else
+          outside[tile] = true
+        end
+      end
+    end
+    inside.keys
+  end
+
+
 end
 
 $board = Board.new
