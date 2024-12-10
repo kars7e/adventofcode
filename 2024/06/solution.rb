@@ -1,4 +1,5 @@
 require 'set'
+require 'benchmark'
 INPUT_FILE = __dir__ + "/input.txt"
 $matrix = File.readlines(INPUT_FILE).map { |row| row.strip.split('') }
 $board = nil
@@ -95,6 +96,9 @@ class Board
 end
 
 $board = Board.new
-
+puts puts Benchmark.measure {
 puts $board.walk1
+}
+puts Benchmark.measure {
 puts $board.walk2
+}
