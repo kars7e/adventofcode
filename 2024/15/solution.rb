@@ -9,10 +9,10 @@ until line.strip.empty?
   $matrix << line.strip.split('')
   line = f.gets
 end
-
 until f.eof?
   $directions += f.gets.strip.split('')
 end
+
 $board = nil
 $height, $width = $matrix.length, $matrix[0].length
 
@@ -26,7 +26,6 @@ DIRS = {
 class Tile
   attr_reader :x, :y
   attr_accessor :value
-  DIRECTIONS = [[-1, 0], [0, 1], [1, 0], [0, -1]]
   UPDOWN = [[0, 1], [0, -1]]
   LEFTRIGHT = [[-1, 0], [1, 0]]
 
@@ -128,14 +127,6 @@ class Board
     @board[x][y]
   end
 
-  def iterate_over_board
-    (0...$width).each do |x|
-      (0...$height).reverse_each do |y|
-        yield self[x, y]
-      end
-    end
-  end
-
   def walk
     tile = start
     $directions.map do |cur_dir|
@@ -165,9 +156,6 @@ class Board
   def walk2
     tile = start
     $directions.map do |cur_dir|
-      # puts to_s(2)
-      # puts cur_dir
-      # puts
       next_tile = tile.tile_on(DIRS[cur_dir])
       next if next_tile.wall?
       if next_tile.empty?
@@ -180,7 +168,6 @@ class Board
       begin
         next_tile.move(DIRS[cur_dir], tile)
       rescue
-        puts "cannot move {cur_dir}"
         next
       end
       tile.empty
@@ -208,7 +195,6 @@ class Board
         else
           raise "Unknown value: #{value}"
         end
-
       end
     end
   end
@@ -237,6 +223,5 @@ $board = Board.new
 puts $board.solve
 
 $board.reprocess_board
-# puts $board.to_s(2)
 puts $board.solve2
 puts $board.to_s(2)
