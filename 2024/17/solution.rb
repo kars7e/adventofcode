@@ -135,7 +135,7 @@ def solution1(program, input)
   Machine.new(program).run(input).join(',')
 end
 
-def find_reverse(pos, start, program)
+def find(pos, start, program)
   return start if pos == 0
   (start * 8...(start * 8 + 8)).each do |a|
     if routine(a) == program[pos - 1]
@@ -147,28 +147,9 @@ def find_reverse(pos, start, program)
   nil
 end
 
-def solution2_1(program)
-  find_reverse(program.size, 0, program)
+def solution2(program)
+  find(program.size, 0, program)
 end
-
-def find(pos, program, partial = 0)
-  return partial if program.size == pos + 1
-  puts "trying #{partial}, #{partial.to_s(2).rjust(pos * 3, "0")} for #{pos}"
-  ((partial << 3)...((partial << 3) + 8)).each do |a|
-
-    if routine(a) == program[pos]
-      f = find(pos + 1, program, a)
-      return f if f
-    end
-  end
-
-  nil
-end
-
-def solution2_2(program)
-  find(0, program)
-end
-
 
 
 puts "Solution 1: " + solution1(program, reg_a)
@@ -176,5 +157,4 @@ puts "Solution 1a: " + simplified(reg_a).join(',')
 
 
 
-puts "Solution 2: " + solution2_1(program).to_s
-puts "Solution 2a: " + solution2_2(program).to_s
+puts "Solution 2: " + solution2(program).to_s
