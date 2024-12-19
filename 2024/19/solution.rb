@@ -5,9 +5,9 @@ patterns = f.readlines.map { |line| line.strip }
 
 def find(pattern, towels, memo = {})
   return 1 if pattern.empty?
-  memo[pattern] ||= towels.map { |towel| pattern.start_with?(towel) ? find(pattern[towel.size..], towels, memo) : nil }.compact.sum
+  memo[pattern] ||= towels.filter_map { |towel| find(pattern[towel.size..], towels, memo) if pattern.start_with?(towel) }.sum
 end
 
 memo = {}
-puts "solution1: " + patterns.map { |pattern| find(pattern, towels, memo) }.compact.select { |x| x > 0 }.count.to_s
-puts "solution2: " + patterns.map { |pattern| find(pattern, towels, memo) }.compact.sum.to_s
+puts "solution1: " + patterns.map { |pattern| find(pattern, towels, memo) }.select { |x| x > 0 }.count.to_s
+puts "solution2: " + patterns.map { |pattern| find(pattern, towels, memo) }.sum.to_s
