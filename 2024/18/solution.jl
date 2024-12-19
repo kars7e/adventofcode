@@ -1,20 +1,20 @@
-map_values = Dict{Vector{Int64}, String}()
+map_values = Dict{Vector{Int64},String}()
 dimension = 70
 
 function neighbours(block)
-    [block + dir for dir in [[-1,0],[1,0],[0,1],[0,-1]] if all(block + dir .<= dimension) && all(block + dir .>= 0) && get(map_values, block+dir, ".") == "."] 
+    [block + dir for dir in [[-1, 0], [1, 0], [0, 1], [0, -1]] if all(block + dir .<= dimension) && all(block + dir .>= 0) && get(map_values, block + dir, ".") == "."]
 end
 
 function bfs(neighbours::Function)
-    visited = Dict{Vector{Int64}, Int64}()
-    to_visit = [([0,0], 0)]
+    visited = Dict{Vector{Int64},Int64}()
+    to_visit = [([0, 0], 0)]
 
     while !isempty(to_visit)
         current, cost = popfirst!(to_visit)
         if haskey(visited, current) && get(visited, current, 0) <= cost
             continue
         end
-        
+
         visited[current] = cost
 
         for neigh in neighbours(current)
@@ -32,12 +32,12 @@ end
 
 function add_bytes(bytes)
     for (x, y) in bytes
-        map_values[[x,y]] = "#"
+        map_values[[x, y]] = "#"
     end
 end
 
 function reset()
-    global map_values = Dict{Vector{Int64}, String}()
+    global map_values = Dict{Vector{Int64},String}()
     map_values
 end
 
@@ -46,15 +46,21 @@ lines = readlines(f)
 close(f)
 available_bytes = map(parse_line, lines)
 
+function min_path_cost()
+    graph = bfs(neighbours)
+    get(graph, [70, 70], -1)
+end
+
 function min_path()
     graph = bfs(neighbours)
-    get(graph, [70,70], -1)
+
+    while True
 end
 
 function bin_search()
     left = 1
     right = size(available_bytes)[1]
-    
+
     while left != right
         middle = floor(Int, (left + right) / 2)
         reset()
@@ -74,8 +80,6 @@ function solution1()
     add_bytes(available_bytes[begin:1024])
     min_path()
 end
-
-
 
 function solution2()
     bin_search()
