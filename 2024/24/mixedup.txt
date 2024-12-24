@@ -1,0 +1,59 @@
+csn AND nmn -> vwp
+csn XOR nmn -> z19
+mqj XOR pqn -> z25
+vbw OR qkk -> mps
+vjv
+cqm
+
+(left, op, right, res) = ("gck", "XOR", "cfb", "z32")
+(left, op, right, res) = ("qfh", "OR", "mpr", "gck")
+(left, op, right, res) = ("y31", "AND", "x31", "qfh")
+(left, op, right, res) = ("twk", "AND", "qhv", "mpr")
+(left, op, right, res) = ("x32", "XOR", "y32", "cfb")
+
+(left, op, right, res) = ("hgj", "XOR", "cqm", "z33")
+(left, op, right, res) = ("khb", "OR", "snc", "hgj")
+(left, op, right, res) = ("y32", "AND", "x32", "khb")
+(left, op, right, res) = ("gck", "AND", "cfb", "snc")
+(left, op, right, res) = ("x33", "AND", "y33", "vjv")
+
+
+(left, op, right, res) = ("vgm", "XOR", "qnw", "z34")
+(left, op, right, res) = ("x34", "XOR", "y34", "vgm")
+(left, op, right, res) = ("vjv", "OR", "djh", "qnw")
+(left, op, right, res) = ("x33", "XOR", "y33", "cqm")
+(left, op, right, res) = ("cqm", "AND", "hgj", "djh")
+
+
+
+< x33 XOR y33 -> cqm
+---
+> x33 XOR y33 -> vjv
+98a99
+> mqj XOR pqn -> mps
+137,139c138
+< mqj XOR pqn -> z25
+< vbw OR qkk -> mps
+< mks XOR bhr -> vcv
+---
+> vbw OR qkk -> z25
+144c143
+< x33 AND y33 -> vjv
+---
+> x33 AND y33 -> cqm
+176,177c175
+< csn AND nmn -> vwp
+< csn XOR nmn -> z19
+---
+> csn AND nmn -> z19
+234a233
+> mks XOR bhr -> vcv
+251a251
+> csn XOR nmn -> vwp
+
+"cqm","vjv","mps","z25","vcv","vwp","z19"
+
+
+"z13","vcv","vwp","z19","z25","mps","vjv","cqm"
+
+
